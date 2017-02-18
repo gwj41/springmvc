@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+       xmlns:tx="http://www.springframework.org/schema/tx" xmlns:task="http://www.springframework.org/schema/task"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd
+       http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+       http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
+    <jpa:repositories base-package="com.robbie.mvc.repository" entity-manager-factory-ref="entityManagerFactory"
+                      transaction-manager-ref="transactionManager" base-class="com.robbie.mvc.repository.impl.ExtendedRepositoryImpl"/>
+    <task:executor id="executor" pool-size="20" keep-alive="100000000" />
+    <task:annotation-driven executor="executor"/>
+    <!--<bean id="customAuditorAware" class="com.robbie.mvc.utils.CustomAuditorAware"/>-->
+    <jpa:auditing auditor-aware-ref="customAuditorAware" />
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
+        <property name="ignoreResourceNotFound" value="true" />
+        <property name="locations">
+            <list>
+                <!-- 标准配置 -->
+                <value>classpath*:/application.properties</value>
+                <!-- 本地开发环境配置
+                <value>classpath*:/application.local.properties</value>-->
+                <!-- 服务器生产环境配置 -->
+                <!-- <value>file:/var/myapp/application.server.properties</value> -->
+            </list>
+        </property>
+    </bean>
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+        <property name="driverClass" value="${jdbc.driverClassName}"/>
+        <property name="jdbcUrl" value="${jdbc.url}"/>
+        <property name="user" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+        <property name="minPoolSize"><value>1</value></property>
+        <property name="maxPoolSize"><value>20</value></property>
+        <property name="maxIdleTime"><value>1800</value></property>
+        <property name="acquireIncrement"><value>2</value></property>
+        <property name="maxStatements"><value>0</value></property>
+        <property name="initialPoolSize"><value>1</value></property>
+        <property name="idleConnectionTestPeriod"><value>1800</value></property>
+        <property name="acquireRetryAttempts"><value>30</value></property>
+        <property name="breakAfterAcquireFailure"><value>true</value></property>
+        <property name="testConnectionOnCheckout"><value>false</value></property>
+    </bean>
+
+    <bean id="entityManagerFactory"
+          class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+        <property name="packagesToScan" value="com.robbie.mvc.entity"/>
+        <!--Hibernate User Guide 23.Configurations-->
+        <property name="jpaPropertyMap">
+            <map merge="true">
+                <entry key="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect" />
+                <entry key="connection.provider_class" value="org.hibernate.c3p0.internal.C3P0ConnectionProvider" />
+                <entry key="hibernate.hbm2ddl.auto" value="create" />
+                <entry key="hibernate.cache.region.factory_class" value="org.hibernate.cache.ehcache.EhCacheRegionFactory" />
+                <entry key="hibernate.generate_statistics" value="true" />
+                <entry key="hibernate.connection.release_mode" value="auto" />
+                <entry key="hibernate.autoReconnect" value="true" />
+                <entry key="hibernate.cglib.use_reflection_optimizer" value="true" />
+                <entry key="hibernate.show_sql" value="${hibernate.show_sql}" />
+                <entry key="hibernate.format_sql" value="${hibernate.format_sql}" />
+                <!--<entry key="hibernate.default_schema" value="spring-data"/>-->
+                <!--<entry key="javax.persistence.hibernate.hbm2ddl.import_files" value="/init.sql"/>-->
+            </map>
+        </property>
+        <property name="jpaProperties">
+            <props merge="true">
+                <prop key="hibernate.hbm2ddl.auto">create</prop>
+                <prop key="hibernate.dialect">org.hibernate.dialect.MySQL57InnoDBDialect</prop>
+                <!--<prop key="hibernate.default_schema">spring-data</prop>-->
+                <!--<prop key="javax.persistence.hibernate.hbm2ddl.import_files">/init.sql</prop>-->
+            </props>
+        </property>
+        <property name="dataSource" ref="dataSource"/>
+        <property name="jpaVendorAdapter">
+            <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+                <property name="database" value="MYSQL"/>
+                <property name="showSql" value="${hibernate.show_sql}"/>
+                <property name="generateDdl" value="true"/>
+                <property name="databasePlatform" value="org.hibernate.dialect.MySQL57InnoDBDialect"/>
+            </bean>
+        </property>
+    </bean>
+    <bean id="transactionManager"
+          class="org.springframework.orm.jpa.JpaTransactionManager" scope="prototype">
+        <property name="entityManagerFactory" ref="entityManagerFactory"/>
+    </bean>
+</beans>

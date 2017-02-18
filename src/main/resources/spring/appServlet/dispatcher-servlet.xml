@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop" xmlns:task="http://www.springframework.org/schema/task"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/mvc
+       http://www.springframework.org/schema/mvc/spring-mvc.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/aop
+       http://www.springframework.org/schema/aop/spring-aop.xsd http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
+    <mvc:annotation-driven conversion-service="conversionService">
+        <mvc:async-support default-timeout="3000000"/>
+        <mvc:argument-resolvers>
+            <bean class="org.springframework.data.web.SortHandlerMethodArgumentResolver"/>
+            <bean class="org.springframework.data.web.PageableHandlerMethodArgumentResolver">
+                <property name="maxPageSize" value="10"/>
+            </bean>
+        </mvc:argument-resolvers>
+    </mvc:annotation-driven>
+    <bean id="conversion-service" class="org.springframework.context.support.ConversionServiceFactoryBean">
+        <property name="converters">
+            <set>
+                <bean class="com.robbie.mvc.converters.DateConverter"/>
+                <bean class="com.robbie.mvc.converters.UserConverter"/>
+            </set>
+        </property>
+    </bean>
+    <!--<bean class="org.springframework.format.support.FormattingConversionServiceFactoryBean"/>-->
+    <bean id="conversionService" class="org.springframework.format.support.DefaultFormattingConversionService"/>
+    <bean class="org.springframework.data.repository.support.DomainClassConverter">
+        <constructor-arg name="conversionService" ref="conversionService"/>
+    </bean>
+<!--    <task:executor id="executor" pool-size="10" />
+    <task:annotation-driven executor="executor"/>-->
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <mvc:mapping path="/robbie/register/**"/>
+            <bean class="com.robbie.mvc.interceptors.GlobalInterceptor"/>
+        </mvc:interceptor>
+    </mvc:interceptors>
+    <bean id="hitCounter" class="com.robbie.mvc.utils.HitCounter" scope="session">
+        <aop:scoped-proxy />
+    </bean>
+    <context:component-scan base-package="com.robbie.mvc.controllers"/>
+    <context:component-scan base-package="com.robbie.mvc.resolvers"/>
+<!--    <bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/views/"/>
+        <property name="suffix" value=".jsp"/>
+    </bean>
+    <bean class="org.springframework.web.servlet.view.XmlViewResolver">
+        <property name="location" value="/WEB-INF/spring/views.xml"/>
+        <property name="order" value="1"/>
+    </bean>-->
+    <bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
+        <property name="viewResolvers">
+            <list>
+                <bean id="viewResolver"
+                      class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+                    <property name="prefix" value="/WEB-INF/views/" />
+                    <property name="suffix" value=".jsp" />
+                </bean>
+
+                <bean class="org.springframework.web.servlet.view.XmlViewResolver">
+                    <property name="location" value="/WEB-INF/spring/views.xml" />
+                    <property name="order" value="1" />
+                </bean>
+            </list>
+        </property>
+        <property name="contentNegotiationManager">
+            <bean class="org.springframework.web.accept.ContentNegotiationManager">
+                <constructor-arg>
+                    <bean class="org.springframework.web.accept.PathExtensionContentNegotiationStrategy">
+                        <constructor-arg>
+                            <map>
+                                <entry key="json" value="application/json" />
+                                <entry key="xml" value="application/xml" />
+                            </map>
+                        </constructor-arg>
+                    </bean>
+                </constructor-arg>
+            </bean>
+        </property>
+        <property name="defaultViews">
+            <list>
+                <bean class="org.springframework.web.servlet.view.json.MappingJackson2JsonView"/>
+            </list>
+        </property>
+    </bean>
+    <bean id="multipartResolver" class="org.springframework.web.multipart.support.StandardServletMultipartResolver"/>
+    <mvc:resources mapping="/resources/**" location="/resources/"/>
+</beans>

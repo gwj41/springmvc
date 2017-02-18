@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:security="http://www.springframework.org/schema/security"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/security
+		http://www.springframework.org/schema/security/spring-security.xsd">
+    <bean class="org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler"/>
+    <security:http use-expressions="false" entry-point-ref="loginEntryPoint">
+        <!--<security:http-basic />-->
+<!--        <security:form-login login-page="/mvc/robbie/login" always-use-default-target="true" default-target-url="/mvc/robbie/appointment/"
+                             login-processing-url="/login" username-parameter="username" password-parameter="password"
+                             authentication-failure-url="/mvc/robbie/login?error=true"/>-->
+        <security:custom-filter ref="customFormLoginFilter" position="FORM_LOGIN_FILTER"/>
+        <security:intercept-url pattern="/mvc/robbie/services/*" access="ROLE_FOO"/>
+        <security:intercept-url pattern="/mvc/robbie/appointment/*" access="ROLE_USER,ROLE_FOO"/>
+        <security:intercept-url pattern="/**" access="ROLE_ANONYMOUS, ROLE_USER, ROLE_FOO"/>
+        <security:logout logout-url="/logout" logout-success-url="/mvc/robbie/login?logout=true"/>
+    </security:http>
+
+    <bean id="customFormLoginFilter" class="com.robbie.security.filter.CustomAuthenticationFilter">
+        <property name="filterProcessesUrl" value="/login"/>
+        <property name="authenticationManager" ref="authenticationManager"/>
+        <property name="usernameParameter" value="username"/>
+        <property name="passwordParameter" value="password"/>
+        <property name="authenticationSuccessHandler">
+            <bean class="org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler">
+                <property name="defaultTargetUrl" value="/mvc/robbie/appointment/"/>
+            </bean>
+        </property>
+        <property name="authenticationFailureHandler">
+            <bean class="org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler">
+                <property name="defaultFailureUrl" value="/mvc/robbie/login?error=true"/>
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="loginEntryPoint" class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
+        <constructor-arg value="/mvc/robbie/login"/>
+    </bean>
+
+    <security:authentication-manager id="authenticationManager">
+        <security:authentication-provider ref="customAuthenticationProvider">
+            <!--<security:password-encoder ref="passwordEncoder"/>-->
+<!--            <security:user-service>
+                <security:user name="user" password="111" authorities="ROLE_USER"/>
+                <security:user name="admin" password="222" authorities="ROLE_USER,ROLE_FOO"/>
+            </security:user-service>-->
+        </security:authentication-provider>
+        <security:ldap-authentication-provider server-ref="ldapServer" user-dn-pattern="uid={0},ou=people"/>
+    </security:authentication-manager>
+    <security:ldap-server id="ldapServer" url="ldap://localhost:10389/dc=oreilly,dc=com" manager-dn="uid=admin,ou=system"
+                          manager-password="secret"/>
+    <bean id="passwordEncoder" class="org.springframework.security.crypto.password.StandardPasswordEncoder"/>
+</beans>

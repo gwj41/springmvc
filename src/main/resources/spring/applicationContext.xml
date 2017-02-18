@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="
+         http://www.springframework.org/schema/beans
+         http://www.springframework.org/schema/beans/spring-beans.xsd
+         http://www.springframework.org/schema/context
+         http://www.springframework.org/schema/context/spring-context.xsd">
+    <!--<import resource="classpath*:jaxrs-config/non-singleton-config.xml"/>-->
+    <context:component-scan base-package="com.robbie">
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+        <context:exclude-filter type="regex" expression="com.robie.mvc.resolvers.*"/>
+        <context:exclude-filter type="regex" expression="com.robie.mvc.repository.*"/>
+    </context:component-scan>
+    <import resource="jpa-config.xml"/>
+    <import resource="classpath:spring/rest/rest.xml"/>
+    <!--<import resource="security-config.xml"/>-->
+    <!--<bean id="user1" class="com.robbie.mvc.entity.User"/>
+    <bean id="suzhouUser1" class="com.robbie.mvc.entity.SuzhouUser"/>
+    <bean id="testMethodReplacer" class="com.robbie.mvc.utils.TestMethodReplacer"/>
+    <bean id="userRepo" class="com.robbie.mvc.utils.UserRepo">
+        <lookup-method name="getUser" bean="suzhouUser1"/>
+        <replaced-method name="replaceMe" replacer="testMethodReplacer"/>
+    </bean>-->
+</beans>
+
