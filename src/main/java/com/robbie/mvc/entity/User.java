@@ -56,6 +56,8 @@ public class User implements UserDetails,Serializable{
     @ManyToOne
     @JoinColumn(name = "DEALERSHIP_ID")
     private Dealership dealership;
+    @Transient
+    private Collection<? extends GrantedAuthority> authorities;
     @CreatedBy
     private String createdBy;
     @LastModifiedBy
@@ -65,9 +67,9 @@ public class User implements UserDetails,Serializable{
     @LastModifiedDate
     private Date lastModifiedDate;
 
-    public Collection<? extends GrantedAuthority> getAuthorities() {
+/*    public Collection<? extends GrantedAuthority> getAuthorities() {
         return AuthorityUtils.createAuthorityList(this.role);
-    }
+    }*/
 
     public boolean isAccountNonExpired() {
         return true;

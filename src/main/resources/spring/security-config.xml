@@ -6,15 +6,16 @@
         http://www.springframework.org/schema/security
 		http://www.springframework.org/schema/security/spring-security.xsd">
     <bean class="org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler"/>
-    <security:http use-expressions="false" entry-point-ref="loginEntryPoint">
+    <security:http use-expressions="true" entry-point-ref="loginEntryPoint">
         <!--<security:http-basic />-->
-<!--        <security:form-login login-page="/mvc/robbie/login" always-use-default-target="true" default-target-url="/mvc/robbie/appointment/"
+        <security:form-login login-page="/mvc/robbie/login" always-use-default-target="true" default-target-url="/mvc/robbie/appointment/"
                              login-processing-url="/login" username-parameter="username" password-parameter="password"
-                             authentication-failure-url="/mvc/robbie/login?error=true"/>-->
-        <security:custom-filter ref="customFormLoginFilter" position="FORM_LOGIN_FILTER"/>
-        <security:intercept-url pattern="/mvc/robbie/services/*" access="ROLE_FOO"/>
-        <security:intercept-url pattern="/mvc/robbie/appointment/*" access="ROLE_USER,ROLE_FOO"/>
-        <security:intercept-url pattern="/**" access="ROLE_ANONYMOUS, ROLE_USER, ROLE_FOO"/>
+                             authentication-failure-url="/mvc/robbie/login?error=true"/>
+        <!--<security:custom-filter ref="customFormLoginFilter" position="FORM_LOGIN_FILTER"/>-->
+        <security:intercept-url pattern="/mvc/robbie/services/*" access="principal == 'gwj42'"/>
+        <security:intercept-url pattern="/mvc/robbie/appointment/*" access="hasAuthority('ROLE_USER') or hasAnyAuthority('ROLE_ADMIN')"/>
+        <security:intercept-url pattern="/**" access="hasAnyAuthority('ROLE_ANONYMOUS', 'ROLE_USER', 'ROLE_FOO','ROLE_ADMIN')"/>
+        <!--<security:intercept-url pattern="/**" access="permitAll"/>-->
         <security:logout logout-url="/logout" logout-success-url="/mvc/robbie/login?logout=true"/>
     </security:http>
 
@@ -38,18 +39,24 @@
     <bean id="loginEntryPoint" class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
         <constructor-arg value="/mvc/robbie/login"/>
     </bean>
-
-    <security:authentication-manager id="authenticationManager">
-        <security:authentication-provider ref="customAuthenticationProvider">
-            <!--<security:password-encoder ref="passwordEncoder"/>-->
-<!--            <security:user-service>
+<!--    <security:authentication-manager>
+        <security:authentication-provider>
+            <security:password-encoder ref="passwordEncoder"/>
+            <security:user-service>
                 <security:user name="user" password="111" authorities="ROLE_USER"/>
                 <security:user name="admin" password="222" authorities="ROLE_USER,ROLE_FOO"/>
-            </security:user-service>-->
+            </security:user-service>
         </security:authentication-provider>
-        <security:ldap-authentication-provider server-ref="ldapServer" user-dn-pattern="uid={0},ou=people"/>
+    </security:authentication-manager>-->
+<!--    <security:authentication-manager id="authenticationManager">
+        <security:authentication-provider ref="customAuthenticationProvider"/>
+    </security:authentication-manager>-->
+    <security:authentication-manager id="authenticationManager">
+        <security:ldap-authentication-provider server-ref="ldapServer" user-context-mapper-ref="contextMapper"
+                                               user-search-filter="(uid={0})" group-search-base="ou=groups"
+                                               group-role-attribute="cn" group-search-filter="uniqueMember={0}" role-prefix="ROLE_"/>
     </security:authentication-manager>
-    <security:ldap-server id="ldapServer" url="ldap://localhost:10389/dc=oreilly,dc=com" manager-dn="uid=admin,ou=system"
+    <security:ldap-server id="ldapServer" url="ldap://localhost:10389/dc=robbie,dc=com" manager-dn="uid=admin,ou=system"
                           manager-password="secret"/>
     <bean id="passwordEncoder" class="org.springframework.security.crypto.password.StandardPasswordEncoder"/>
 </beans>
