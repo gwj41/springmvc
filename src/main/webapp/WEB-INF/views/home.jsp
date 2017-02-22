@@ -14,6 +14,7 @@
 <body>
 <jsp:include page="header.jsp"></jsp:include>
 <h1>Welcome Home:)</h1>
+<c:if test="${not empty user}">
     <table>
         <tr>
             <td>First name: </td><td>${user.firstName}</td>
@@ -25,6 +26,10 @@
             <td>Birthday: </td><td>${user.birthday}</td>
         </tr>
     </table>
+</c:if>
+<c:if test="${not empty dealership}">
+    Deleted Dealership is ${dealership.name}
+</c:if>
 <a href="<spring:url value="/mvc/robbie/register"/>">register</a>
 </body>
 </html>

@@ -2,6 +2,7 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <html>
 <head>
     <script type="text/javascript" language="JavaScript" src="<spring:url value="/resources/jslib/jquery-3.1.1.js"/>"></script>
@@ -261,29 +262,39 @@
 <body>
     <jsp:include page="header.jsp"></jsp:include>
     ${currentDate}
-    <%--${roles}--%>
-    <spring:url var="formUrl" value="/mvc/robbie/review" />
-    <form:form action="${formUrl}" method="post" modelAttribute="user">
-        <label for="username" rel="User Name" >User Name</label>
-        <form:input id="username" type="text" path="username" /><br/>
-        <label for="password" rel="Password" >Password</label>
-        <form:input id="password" type="text" path="password" /><br/>
-        <label for="firstName" rel="First Name" >First Name</label>
-        <form:input id="firstName" type="text" path="firstName" /><br/>
-        <label for="lastName" rel="Last name">Last Name</label>
-        <form:input id="lastName" type="text" path="lastName" />
-        <form:errors path="lastName"/><br/>
-        <label for="birthday" rel="Birthday">Birthday</label>
-        <form:input id="birthday" type="text" path="birthday" />
-        <form:errors path="birthday"/><br/>
-        <label for="age" rel="Age">Age</label>
-        <form:input id="age" type="text" path="age" /><br/>
-        <label for="role" rel="Role">Role</label>
-        <form:select id="role" path="role">
-            <form:options items="${roles}"></form:options>
-        </form:select><br/>
-        <input type="submit" value="Submit" />
-    </form:form>
+    <sec:authorize access="isAuthenticated()" var="authenticated"/>
+    <c:choose>
+        <c:when test="${not authenticated}">
+            <spring:url var="formUrl" value="/mvc/robbie/review" />
+            <form:form action="${formUrl}" method="post" modelAttribute="user">
+                <label for="username" rel="User Name" >User Name</label>
+                <form:input id="username" type="text" path="username" /><br/>
+                <label for="password" rel="Password" >Password</label>
+                <form:input id="password" type="password" path="password" /><br/>
+                <label for="firstName" rel="First Name" >First Name</label>
+                <form:input id="firstName" type="text" path="firstName" /><br/>
+                <label for="lastName" rel="Last name">Last Name</label>
+                <form:input id="lastName" type="text" path="lastName" />
+                <form:errors path="lastName"/><br/>
+                <label for="birthday" rel="Birthday">Birthday</label>
+                <form:input id="birthday" type="text" path="birthday" />
+                <form:errors path="birthday"/><br/>
+                <label for="age" rel="Age">Age</label>
+                <form:input id="age" type="text" path="age" /><br/>
+                <label for="role" rel="Role">Role</label>
+                <form:select id="role" path="role">
+                    <form:options items="${roles}"></form:options>
+                </form:select><br/>
+                <input type="submit" value="Submit" />
+            </form:form>
+        </c:when>
+        <c:otherwise>
+            <div>
+            <a id="dealership" href="<spring:url value="/mvc/dealer/dealerships"/>">View all dealerships</a>
+            </div>
+        </c:otherwise>
+    </c:choose>
+
     <div>上传文件</div>
     <spring:url value="/robbie/upload" var="uploadUrl"/>
     <form:form action="${uploadUrl}" method="post" enctype="multipart/form-data">

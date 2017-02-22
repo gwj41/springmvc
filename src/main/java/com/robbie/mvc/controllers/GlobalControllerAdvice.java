@@ -1,5 +1,7 @@
 package com.robbie.mvc.controllers;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -28,5 +30,10 @@ public class GlobalControllerAdvice {
     public String handleError(HttpServletRequest request,NullPointerException e) {
         e.printStackTrace();
         return "exceptions/exception";
+    }
+
+    @ModelAttribute(value = "isAdmin")
+    public boolean isAdmin(Authentication authentication) {
+        return authentication != null && authentication.getAuthorities().contains(AuthorityUtils.createAuthorityList("ROLE_ADMIN").get(0));
     }
 }

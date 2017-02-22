@@ -43,4 +43,6 @@ public interface UserRepository extends BaseRepository<User, Long> {
     int updateAge(@Param(value = "lastName") String lastName, @Param(value = "age") int age);
 
     User findByUsername(String username);
+
+    String findRoleByUsername(String username);
 }

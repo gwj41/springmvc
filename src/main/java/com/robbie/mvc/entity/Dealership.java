@@ -5,6 +5,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.List;
 
 @Entity
 @Table
@@ -23,4 +24,6 @@ public class Dealership implements Serializable {
     private String brand;
     @Column(length = 20)
     private String phoneNumber;
+    @OneToMany(cascade = CascadeType.ALL,mappedBy = "dealership")
+    private List<User> users;
 }

@@ -12,10 +12,12 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -27,8 +29,10 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.ArrayList;
@@ -82,6 +86,7 @@ public class HomeController {
 
     @RequestMapping(value = "/home",method = RequestMethod.GET)
     public String goHome(SessionStatus status) {
+        SecurityContextHolder.getContext().getAuthentication().getAuthorities();
         status.setComplete();
         return "home";
     }
@@ -112,7 +117,9 @@ public class HomeController {
     }
 
     @RequestMapping(value = "/save")
-    @PreAuthorize(value = "hasAnyRole('ROLE_USER') or hasAnyRole('ROLE_ADMIN')")
+//    @PreAuthorize(value = "hasAnyRole('ROLE_USER') or hasAnyRole('ROLE_ADMIN')")
+//    @RolesAllowed("ROLE_USER,ROLE_ADMIN")
+    @PostAuthorize(value = "#user.role == 'ROLE_USER'")
     public String save(@ModelAttribute User user, RedirectAttributes redirectAttributes) {
         System.out.println("register invoked!");
         redirectAttributes.addFlashAttribute("user", user);

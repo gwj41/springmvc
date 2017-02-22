@@ -2,10 +2,11 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jpa="http://www.springframework.org/schema/data/jpa"
        xmlns:tx="http://www.springframework.org/schema/tx" xmlns:task="http://www.springframework.org/schema/task"
+       xmlns:ldap="http://www.springframework.org/schema/ldap"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
        http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd
        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
-       http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
+       http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd http://www.springframework.org/schema/ldap http://www.springframework.org/schema/ldap/spring-ldap.xsd">
     <jpa:repositories base-package="com.robbie.mvc.repository" entity-manager-factory-ref="entityManagerFactory"
                       transaction-manager-ref="transactionManager" base-class="com.robbie.mvc.repository.impl.ExtendedRepositoryImpl"/>
     <task:executor id="executor" pool-size="20" keep-alive="100000000" />
@@ -53,22 +54,23 @@
                 <entry key="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect" />
                 <entry key="connection.provider_class" value="org.hibernate.c3p0.internal.C3P0ConnectionProvider" />
                 <entry key="hibernate.hbm2ddl.auto" value="create" />
-                <entry key="hibernate.cache.region.factory_class" value="org.hibernate.cache.ehcache.EhCacheRegionFactory" />
+                <!--<entry key="hibernate.cache.region.factory_class" value="org.hibernate.cache.ehcache.EhCacheRegionFactory" />-->
                 <entry key="hibernate.generate_statistics" value="true" />
                 <entry key="hibernate.connection.release_mode" value="auto" />
                 <entry key="hibernate.autoReconnect" value="true" />
                 <entry key="hibernate.cglib.use_reflection_optimizer" value="true" />
                 <entry key="hibernate.show_sql" value="${hibernate.show_sql}" />
                 <entry key="hibernate.format_sql" value="${hibernate.format_sql}" />
-                <!--<entry key="hibernate.default_schema" value="spring-data"/>-->
-                <!--<entry key="javax.persistence.hibernate.hbm2ddl.import_files" value="/init.sql"/>-->
+                <entry key="hibernate.hbm2ddl.import_files_sql_extractor" value="org.hibernate.tool.hbm2ddl.MultipleLinesSqlCommandExtractor"/>
+                <entry key="javax.persistence.schema-generation.database.action"  value="drop-and-create"/>
+                <entry key="javax.persistence.schema-generation.create-source" value="metadata-then-script"/>
+                <entry key="javax.persistence.schema-generation.create-script-source" value="LoadDDLScript.sql"/>
             </map>
         </property>
         <property name="jpaProperties">
             <props merge="true">
                 <prop key="hibernate.hbm2ddl.auto">create</prop>
                 <prop key="hibernate.dialect">org.hibernate.dialect.MySQL57InnoDBDialect</prop>
-                <!--<prop key="hibernate.default_schema">spring-data</prop>-->
                 <!--<prop key="javax.persistence.hibernate.hbm2ddl.import_files">/init.sql</prop>-->
             </props>
         </property>
@@ -86,4 +88,12 @@
           class="org.springframework.orm.jpa.JpaTransactionManager" scope="prototype">
         <property name="entityManagerFactory" ref="entityManagerFactory"/>
     </bean>
+
+    <ldap:context-source id="context-source" url="ldap://localhost:10389" base="dc=robbie,dc=com" username="uid=admin,ou=system" password="secret"/>
+
+    <ldap:ldap-template id="ldapTemplate" context-source-ref="context-source"/>
+<!--    <ldap:transaction-manager context-source-ref="context-source">
+        <ldap:default-renaming-strategy />
+    </ldap:transaction-manager>-->
+
 </beans>

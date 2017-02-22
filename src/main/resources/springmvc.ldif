@@ -1,9 +1,9 @@
 version: 1
 
 dn: uid=gwj42,ou=people,dc=robbie,dc=com
-objectClass: organizationalPerson
-objectClass: person
 objectClass: inetOrgPerson
+objectClass: person
+objectClass: organizationalPerson
 objectClass: top
 cn: Wenjun Gu
 sn: Wenjun
@@ -14,67 +14,81 @@ userPassword:: e1NTSEE1MTJ9OFJCRHVXYkkrSm1iWFQ2VlJUL1JIZDcyWmswcEJJZjgzYXNQT
  Td2aW43SVJGTVI1dC92QS9RU3l3ZFlITUpxNjVBZUVJUjlYcFVUek9aZDhod0tZaTcwNVE4KzFB
  MFl4
 
-dn: uid=gwj43,ou=customer,dc=robbie,dc=com
+dn: dc=robbie,dc=com
+objectclass: domain
+objectclass: top
+dc: robbie
+
+dn: cn=Admin,ou=groups,dc=robbie,dc=com
+objectClass: top
+objectClass: groupOfUniqueNames
+cn: Admin
+uniqueMember: uid=gwj41,ou=people,dc=robbie,dc=com
+
+dn: cn=User,ou=groups,dc=robbie,dc=com
+objectClass: top
+objectClass: groupOfUniqueNames
+cn: User
+uniqueMember: uid=gwj41,ou=people,dc=robbie,dc=com
+uniqueMember: uid=gwj42,ou=people,dc=robbie,dc=com
+uniqueMember: uid=gwj43,ou=people,dc=robbie,dc=com
+
+dn: uid=gwj43,ou=people,dc=robbie,dc=com
 objectClass: organizationalPerson
 objectClass: person
 objectClass: inetOrgPerson
 objectClass: top
+cn: Yizu Zhu
+sn: Yizu
+givenName: Zhu
+uid: gwj43
+userPassword:: e0NSWVBUfSQ2JG5GOFpFWVVFJFM4R0lwQlZSQXJuZkdKUC5NdlllNTRxdXQ4Y
+ VUvaVhpLnhjc2VCd3Q4WXJqUWRmdzduZ05sM1lCd1NRZklsR3ptZ2RsV3AxV2NnWmdndHhPUTFU
+ LjIv
+
+dn: uid=gwj41,ou=people,dc=robbie,dc=com
+objectClass: top
+objectClass: inetOrgPerson
+objectClass: person
+objectClass: organizationalPerson
+cn: Robbie Gu
+sn: Robbie
+givenName: Gu
+uid: gwj41
+userPassword:: e1NIQTI1Nn02MStCQy8xSlVHbnh2T0JreXBvUklYN3VtNkNBa2FsMEVxdVZQO
+ C9WYm4wPQ==
+
+dn: ou=groups,dc=robbie,dc=com
+objectClass: top
+objectClass: organizationalUnit
+ou: groups
+
+dn: uid=gwj44,ou=customer,dc=robbie,dc=com
+objectClass: inetOrgPerson
+objectClass: person
+objectClass: organizationalPerson
+objectClass: top
 cn: Tom Wang
 sn: Wang
-uid: gwj43
+uid: gwj44
 userPassword:: e1NTSEE1MTJ9Z2F3MmNtczdTcDhCL3l2YytWam1laVZ1RXYrMHpNVDNwdWJlU
  zMrZ0p1R0wwTFA3eVk4a1ZuNTJHK0tQZ0dsMkZQNXd5cmN0K21KWlpVMUJUbENYQ3RuY0xOclli
  VnlB
 
-dn: ou=groups,dc=robbie,dc=com
-objectClass: organizationalUnit
-objectClass: top
-ou: groups
-
 dn: ou=people,dc=robbie,dc=com
-objectClass: organizationalUnit
 objectClass: top
+objectClass: organizationalUnit
 ou: people
 
-dn: cn=Admin,ou=groups,dc=robbie,dc=com
-objectClass: groupOfUniqueNames
-objectClass: top
-cn: Admin
-uniqueMember: uid=gwj41,ou=people,dc=robbie,dc=com
-
-dn: dc=robbie,dc=com
-objectclass: top
-objectclass: domain
-dc: robbie
-
-dn: ou=customer,dc=robbie,dc=com
-objectClass: organizationalUnit
-objectClass: top
-ou: customer
-
-dn: cn=User,ou=groups,dc=robbie,dc=com
-objectClass: groupOfUniqueNames
-objectClass: top
-cn: User
-uniqueMember: uid=gwj41,ou=people,dc=robbie,dc=com
-uniqueMember: uid=gwj42,ou=people,dc=robbie,dc=com
-
 dn: cn=Female,ou=groups,dc=robbie,dc=com
-objectClass: groupOfUniqueNames
 objectClass: top
+objectClass: groupOfUniqueNames
 cn: Female
 uniqueMember: uid=gwj41,ou=people,dc=robbie,dc=com
-uniqueMember: uid=gwj43,ou=customer,dc=robbie,dc=com
+uniqueMember: uid=gwj44,ou=customer,dc=robbie,dc=com
 
-dn: uid=gwj41,ou=people,dc=robbie,dc=com
-objectClass: organizationalPerson
-objectClass: person
-objectClass: inetOrgPerson
+dn: ou=customer,dc=robbie,dc=com
 objectClass: top
-cn: Robbie Gu
-sn: Gu
-givenName: Robbie
-uid: gwj41
-userPassword:: e1NIQTI1Nn02MStCQy8xSlVHbnh2T0JreXBvUklYN3VtNkNBa2FsMEVxdVZQO
- C9WYm4wPQ==
+objectClass: organizationalUnit
+ou: customer
 

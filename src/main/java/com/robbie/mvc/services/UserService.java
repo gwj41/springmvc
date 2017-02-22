@@ -33,4 +33,8 @@ public interface UserService extends UserDetailsService{
     int updateAge(String lastName,int age);
 
     Page<User> findAll(Pageable pageable);
+
+    boolean findRoleByUsername(String username);
+
+    void addUserToGroup(String groupName, String userDn);
 }
